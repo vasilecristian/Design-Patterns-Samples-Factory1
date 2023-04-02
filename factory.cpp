@@ -7,7 +7,11 @@
 *       - Tea is a hot drink
 *       - Coffee is a hot drink
 *
+*   This Example have an issue with the enum class HotDrinkType. The SOLID principle is 
+*   not meet (Open for extension Closed for modifications principle) since when you want 
+*   to extent the enum by adding new types of Hot Drinks the enum must be changed.
 *   
+*   Instead, enum i have used class with static members.
 *
 */
 
@@ -42,35 +46,74 @@ class Cappucino : public IHotDrink
     }
 };
 
-
-enum class HotDrinkType: int
+class Expresso : public IHotDrink
 {
-    Tea,
-    Coffee,
-    Cappucino
+    std::string ToString()
+    {
+        return "Expresso is prepared.... ";
+    }
 };
 
+//---------------------------------------
+// Define the Coffee Machine Function
+
+//enum class HotDrinkType: int
+//{
+//    Tea,
+//    Coffee,
+//    Cappucino,
+//    Expresso
+//};
+
+typedef int HotDrinkType;
+
+class HotDrinks
+{
+public:
+    static const HotDrinkType Tea = 1;
+    static const HotDrinkType Coffee = 2;
+
+    static const HotDrinkType Last = 2;
+};
+
+/** Factory Function Design pattern*/
 IHotDrink* CoffeeMachineCreateDrink(HotDrinkType hotDrinkType)
 {
     switch(hotDrinkType)
     {
-        case HotDrinkType::Coffee:
+        case HotDrinks::Coffee:
             return new Coffee();
 
-        case HotDrinkType::Tea:
+        case HotDrinks::Tea:
             return new Tea();
 
         default:
             return nullptr;
     }
 }
+//---------------------------------------
 
+
+//---------------------------------------
+// Extended the Coffee Machine....
+
+class ExtendedHotDrinks : public HotDrinks
+{
+public:
+    static const HotDrinkType Cappucino = HotDrinks::Last + 1;
+    static const HotDrinkType Expresso = HotDrinks::Last + 2;
+};
+
+/** This is used to extend the CoffeeMachineCreateDrink Function design pattern*/
 IHotDrink* ExtendedCoffeeMachineCreateDrink(HotDrinkType hotDrinkType)
 {
     switch(hotDrinkType)
     {
-        case HotDrinkType::Cappucino:
+        case ExtendedHotDrinks::Cappucino:
             return new Cappucino();
+
+        case ExtendedHotDrinks::Expresso:
+            return new Expresso();
         
         default:
             return CoffeeMachineCreateDrink(hotDrinkType);
@@ -78,19 +121,26 @@ IHotDrink* ExtendedCoffeeMachineCreateDrink(HotDrinkType hotDrinkType)
 
     return nullptr;
 }
+//---------------------------------------
+
+
+
 
 int main()
 {
-    std::cout << "Sample for Factory Method defing pattern!" << std::endl;
+    std::cout << "Sample for Factory Method Design Pattern!" << std::endl;
 
-    IHotDrink* hotDrink1 = ExtendedCoffeeMachineCreateDrink(HotDrinkType::Tea);
+    IHotDrink* hotDrink1 = ExtendedCoffeeMachineCreateDrink(ExtendedHotDrinks::Tea);
     std::cout << "Drink 1: " <<  hotDrink1->ToString() << std::endl;
     
-    IHotDrink* hotDrink2 = ExtendedCoffeeMachineCreateDrink(HotDrinkType::Coffee);
+    IHotDrink* hotDrink2 = ExtendedCoffeeMachineCreateDrink(ExtendedHotDrinks::Coffee);
     std::cout << "Drink 2: " <<  hotDrink2->ToString() << std::endl;
 
-    IHotDrink* hotDrink3 = ExtendedCoffeeMachineCreateDrink(HotDrinkType::Cappucino);
+    IHotDrink* hotDrink3 = ExtendedCoffeeMachineCreateDrink(ExtendedHotDrinks::Cappucino);
     std::cout << "Drink 3: " <<  hotDrink3->ToString() << std::endl;
+
+    IHotDrink* hotDrink4 = ExtendedCoffeeMachineCreateDrink(ExtendedHotDrinks::Expresso);
+    std::cout << "Drink 4: " <<  hotDrink4->ToString() << std::endl;
 
     return 0;
 }
